@@ -20,7 +20,7 @@ public final class Window extends JFrame implements Runnable {
     private volatile int currentScenario = 0;
 
     private Window() {
-        super("Steering Behaviors - PUCPR (SBCarsEngine)");
+        super("Steering Behaviors - (SBCarsEngine)");
         setSize(INITIAL_WIDTH, INITIAL_HEIGHT);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
@@ -177,8 +177,8 @@ public final class Window extends JFrame implements Runnable {
     }
 
     private void drawHud(Graphics2D g2d) {
-        final float left = -getWidth() / 2.0f + 14.0f;
-        final float top = -getHeight() / 2.0f + 14.0f;
+        final float left = -getWidth() / 2.0f + 25.0f;
+        final float top = -getHeight() / 2.0f + 25.0f;
 
         // Caixa superior com título do cenário ativo e atalhos
         g2d.setColor(new Color(20, 24, 32, 200));
