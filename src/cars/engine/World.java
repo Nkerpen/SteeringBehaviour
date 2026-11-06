@@ -1,5 +1,9 @@
 package cars.engine;
 
+import cars.student.Obstacle;
+import cars.student.Path;
+import cars.student.TestMap;
+
 import java.util.List;
 
 import static cars.engine.Car.distance;
@@ -7,7 +11,7 @@ import static cars.engine.Car.distance;
 public final class World {
     private final Car current;
     private final List<Car> cars;
-    private final Vector2 mousePos;   // absolute scene coords; may be null
+    private final Vector2 mousePos;   // center-relative scene coords; may be null
     private final Vector2 clickPos;   // center-relative coords; may be null
     private final double secs;
 
@@ -49,6 +53,14 @@ public final class World {
             .filter(c -> c != current)
             .filter(c -> distance(current, c) <= radius)
             .toList();
+    }
+
+    public List<Obstacle> getObstacles() {
+        return TestMap.getObstacles();
+    }
+
+    public Path getPath() {
+        return TestMap.getCircuitPath();
     }
 
     public double getSecs() {

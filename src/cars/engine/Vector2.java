@@ -369,7 +369,7 @@ public final class Vector2 implements Cloneable {
      * @see Vector2#divide(Vector2, double)
      */
     public Vector2 divide(double scalar) {
-        return multiply(1.0f / scalar);
+        return multiply(1.0 / scalar);
     }
 
     /**
@@ -416,9 +416,9 @@ public final class Vector2 implements Cloneable {
     }
 
     /**
-     * @return This Vector angle around
+     * @return This Vector angle in radians (-pi to pi)
      */
-    double getAngle() {
+    public double getAngle() {
         return Math.atan2(y, x);
     }
 

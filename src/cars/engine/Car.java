@@ -14,6 +14,7 @@ public abstract class Car implements Cloneable {
     private final double maxSpeed;
     private Vector2 position;
     private Vector2 velocity;
+    private double headingAngle;
 
     // Store last clamped steering (pre-dt) for debug drawing
     private Vector2 lastSteering = vec2();
@@ -23,6 +24,7 @@ public abstract class Car implements Cloneable {
         settings.accept(cs);
         this.color = cs.color;
         this.position = cs.position;
+        this.headingAngle = cs.orientation;
         this.velocity = Vector2.byAngle(cs.orientation);
         this.mass = cs.mass;
         this.maxForce = cs.maxForce;
@@ -30,17 +32,28 @@ public abstract class Car implements Cloneable {
     }
 
     // ---- Accessors ----
+    public Color getColor() { return color; }
     public Vector2 getPosition() { return position.clone(); }
     public Vector2 getVelocity() { return velocity.clone(); }
     public double getSpeed() { return velocity.size(); }
 
-    public Vector2 getDirection() { return velocity.isZero() ? byAngle(0) : normalize(velocity); }
+    public Vector2 getDirection() {
+        return velocity.sizeSqr() < 1.0 ? byAngle(headingAngle) : normalize(velocity);
+    }
     public double getMass() { return mass; }
     public double getMaxForce() { return maxForce; }
     public double getMaxSpeed() { return maxSpeed; }
-    private Vector2 getLastSteering() { return lastSteering == null ? null : lastSteering.clone(); }
+    public Vector2 getLastSteering() { return lastSteering == null ? null : lastSteering.clone(); }
 
     public abstract Vector2 calculateSteering(World world);
+
+    /**
+     * Hook opcional para subclasses desenharem informações visuais de debug
+     * (sensores de Obstacle Avoidance, círculo de Wander, projeção no Path, rótulos, etc.)
+     */
+    protected void drawExtraDebug(Graphics2D g, boolean debug) {
+        // Subclasses podem sobrescrever
+    }
 
     void update(World world) {
         final var steeringForce = calculateSteering(world);
@@ -54,6 +67,9 @@ public abstract class Car implements Cloneable {
         final var impulse = multiply(lastSteering, world.getSecs()); // F * dt
         final var acceleration = divide(impulse, mass);              // (F*dt)/m
         velocity = truncate(add(velocity, acceleration), maxSpeed);
+        if (velocity.sizeSqr() >= 4.0) {
+            headingAngle = velocity.getAngle();
+        }
         position = add(position, multiply(velocity, world.getSecs()));
 
         final var w = world.getWidth() / 2.0;
@@ -68,10 +84,12 @@ public abstract class Car implements Cloneable {
     // Drawing (Java2D)
     // -----------------------------------------------------
     void draw(Graphics2D g, boolean debug) {
+        drawExtraDebug(g, debug);
+
         // Car in its local (heading) frame
         final var g2 = (Graphics2D) g.create();
         g2.translate(position.x, position.y);
-        g2.rotate(velocity.getAngle());               // radians
+        g2.rotate(headingAngle);                      // radians
         g2.scale(-0.5, 0.5);                          // mirror X + scale 50% (match JavaFX)
 
         drawF1Car80px(g2, color);
@@ -164,9 +182,9 @@ public abstract class Car implements Cloneable {
         final var oldStroke = g.getStroke();
         final var oldColor = g.getColor();
 
-        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f));
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.45f));
         g.setColor(color);
-        g.setStroke(new BasicStroke(3f));
+        g.setStroke(new BasicStroke(2.5f));
 
         g.draw(new Line2D.Double(origin.x, origin.y, tip.x, tip.y));
 

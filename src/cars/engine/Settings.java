@@ -25,9 +25,9 @@ public final class Settings {
     }
 
     public Settings rgb(int r, int g, int b) {
-        r = Math.clamp(r, 0, 255);
-        g = Math.clamp(g, 0, 255);
-        b = Math.clamp(b, 0, 255);
+        r = Math.max(0, Math.min(255, r));
+        g = Math.max(0, Math.min(255, g));
+        b = Math.max(0, Math.min(255, b));
         return color(new Color(r, g, b));
     }
 
